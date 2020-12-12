@@ -43,7 +43,7 @@ public class adminMenu1 extends AppCompatActivity {
         });
 
 
-        Button newPro1 = (Button) findViewById(R.id.orders); //logout, and move to the login activity
+        Button newPro1 = (Button) findViewById(R.id.newPro2); //logout, and move to the login activity
         newPro1.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view)
             {
@@ -54,7 +54,7 @@ public class adminMenu1 extends AppCompatActivity {
         });
 
         Button ordersButton = (Button) findViewById(R.id.orders); //logout, and move to the login activity
-        newPro1.setOnClickListener(new View.OnClickListener() {
+        ordersButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view)
             {
                 FirebaseAuth.getInstance().signOut();

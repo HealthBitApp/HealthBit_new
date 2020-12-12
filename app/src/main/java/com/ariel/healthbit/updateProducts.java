@@ -121,7 +121,7 @@ public class updateProducts extends AppCompatActivity {
                     st.setHint("Stock");
                     st.setText(""+data.get(i).getUnitsInStock());
                     ll.addView(st,params);
-                    
+
 
                     // Create Button
                     final Button btn = new Button(getBaseContext());
