@@ -95,6 +95,7 @@ public class weighttracker extends AppCompatActivity
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)
             {
+                //read list of weights from db
                 ArrayList<Long> td = (ArrayList<Long>) dataSnapshot.getValue();
                 if(td!=null)
                 {
@@ -103,6 +104,7 @@ public class weighttracker extends AppCompatActivity
                         @Override
                         public void onClick(View v)
                         {
+                            //update list by  adding new weight.
                             Map<String, Object> childDetails = new HashMap<>();
                             String Textweight = updateWeight.getText().toString();
                             if (Textweight.isEmpty()) //check empty EditText
@@ -133,6 +135,7 @@ public class weighttracker extends AppCompatActivity
                             childDetails.put("weights",td1);
                             refWeight = FirebaseDatabase.getInstance().getReference("users").child(auth.getInstance().getCurrentUser().getUid()).child("details");
                             refWeight.updateChildren(childDetails);
+                            //update td list as empty list.
                             td1=new ArrayList<>();
 
                         }
@@ -159,6 +162,7 @@ public class weighttracker extends AppCompatActivity
                 Details det = dataSnapshot.getValue(Details.class);
                 if(det!=null)
                 {
+                    //shoe current weight
                     double w = det.weight;
                     currentweight.setText("My Current Weight: \n" + det.weight);
                 }
