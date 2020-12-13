@@ -46,6 +46,10 @@ public class weighttracker extends AppCompatActivity
     FirebaseAuth auth;
     FirebaseUser user;
     EditText updateWeight;
+    ArrayList<Long> td1=new ArrayList<>();
+
+    double w=0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,35 +91,65 @@ public class weighttracker extends AppCompatActivity
 
         });
 
-
-        //add new weight to db-update also in the graph.
-        addweight.setOnClickListener(new View.OnClickListener() {
+        ValueEventListener WeightsListener = new ValueEventListener() {
             @Override
-            public void onClick(View v) {
-                String Textweight = updateWeight.getText().toString();
-                double w=0;
-                if (Textweight.isEmpty()) //check empty EditText
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                ArrayList<Long> td = (ArrayList<Long>) dataSnapshot.getValue();
+                if(td!=null)
                 {
-                    updateWeight.setError("weight is required!");
-                    return;
-                } else { //check validity of weight
-                    w = Double.parseDouble(Textweight); //covert to double view
-                    if (w < 30 || w > 400) {
-                        updateWeight.setError("invalid value");
-                        return;
-                    }
+                    //add new weight to db-update also in the graph.
+                    addweight.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v)
+                        {
+                            Map<String, Object> childDetails = new HashMap<>();
+                            String Textweight = updateWeight.getText().toString();
+                            if (Textweight.isEmpty()) //check empty EditText
+                            {
+                                updateWeight.setError("weight is required!");
+                                return;
+                            } else { //check validity of weight
+                                w = Double.parseDouble(Textweight); //covert to double view
+                                if (w < 30 || w > 400) {
+                                    updateWeight.setError("invalid value");
+                                    return;
+                                }
+                            }
+                            String pattern = "yyyy-MM-dd";
+                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+                            String currentDate = simpleDateFormat.format(new Date()); //writes current date as a simple format.
+                            //add new weight to db by date as key.
+                            childDetails.put("weight",w);
+                            refWeights = FirebaseDatabase.getInstance().getReference("users").child(auth.getInstance().getCurrentUser().getUid()).child("details").child("weights");
+                            refWeight = FirebaseDatabase.getInstance().getReference("users").child(auth.getInstance().getCurrentUser().getUid()).child("details");
+
+                            for (int i = 0; i < td.size(); i++) {
+                                long weight = td.get(i);
+                                td1.add(weight);
+                            }
+                            long wL=(new Double(w)).longValue();
+                            td1.add(wL);
+                            childDetails.put("weights",td1);
+                            refWeight = FirebaseDatabase.getInstance().getReference("users").child(auth.getInstance().getCurrentUser().getUid()).child("details");
+                            refWeight.updateChildren(childDetails);
+                            td1=new ArrayList<>();
+
+                        }
+
+                    });
+
                 }
-                String pattern = "yyyy-MM-dd";
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-                String currentDate = simpleDateFormat.format(new Date()); //writes current date as a simple format.
-                //add new weight to db by date as key.
-                refWeight = FirebaseDatabase.getInstance().getReference("users").child(auth.getInstance().getCurrentUser().getUid()).child("details").child("weights").push();
-                refWeight.setValue(w);
-                refWeight = FirebaseDatabase.getInstance().getReference("users").child(auth.getInstance().getCurrentUser().getUid()).child("details").child("weight");
-                refWeight.setValue(w);
             }
 
-        });
+            @Override
+            public void onCancelled(@NonNull DatabaseError error)
+            {
+
+            }
+
+        };
+        refWeights.addValueEventListener(WeightsListener);
 
         //show current weight in TextView. (read from db).
         ValueEventListener DetailsListener = new ValueEventListener() {
@@ -140,16 +174,16 @@ public class weighttracker extends AppCompatActivity
 
         refWeights = FirebaseDatabase.getInstance().getReference("users").child(auth.getInstance().getCurrentUser().getUid()).child("details").child("weights");
 
-         ValueEventListener WeightsListener = new ValueEventListener() {
+         ValueEventListener WeightsListener1 = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)
             {
-                Map<String,Long> td = (Map<String,Long>) dataSnapshot.getValue();
+                ArrayList<Long> td = (ArrayList<Long>) dataSnapshot.getValue();
                 if(td!=null) {
-                    ArrayList<Long> values = new ArrayList<>(td.values());
-                    DataPoint[] dp = new DataPoint[values.size()];
-                    for (int i = 0; i < values.size(); i++) {
-                        long weight = values.get(i);
+                    //ArrayList<Long> values = new ArrayList<>(td.values());
+                    DataPoint[] dp = new DataPoint[td.size()];
+                    for (int i = 0; i < td.size(); i++) {
+                        long weight = td.get(i);
                         DataPoint data = new DataPoint(i, weight);
                         dp[i] = data;
                     }
@@ -175,7 +209,7 @@ public class weighttracker extends AppCompatActivity
             }
 
         };
-        refWeights.addValueEventListener(WeightsListener);
+        refWeights.addValueEventListener(WeightsListener1);
 
     }
     @Override

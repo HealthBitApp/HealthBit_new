@@ -13,17 +13,21 @@ import java.util.Map;
 
 public class Details
 {
+
+
     public double height;
     public double weight;
     public String gender;
     public String date;
+    public ArrayList<Double> weights;
 
 
     public double getWeight() {
         return weight;
     }
 
-    public void setWeight(double weight) {
+    public void setWeight(double weight)
+    {
         this.weight = weight;
     }
 
@@ -63,6 +67,16 @@ public class Details
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
         this.date = simpleDateFormat.format(datebirth);
         this.gender=gender;
+        this.weights=new ArrayList<>();
+        this.weights.add(weight);
+    }
+
+    public ArrayList<Double> getWeights() {
+        return weights;
+    }
+
+    public void setWeights(ArrayList<Double> weights) {
+        this.weights = weights;
     }
 
 
@@ -73,6 +87,7 @@ public class Details
         result.put("height", height);
         result.put("weight", weight);
         result.put("gender", gender);
+        result.put("weights",weights);
         return result;
     }
 
